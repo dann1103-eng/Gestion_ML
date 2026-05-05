@@ -107,6 +107,11 @@ enum TipoPlantilla {
   OTRO
 }
 
+enum SeccionNota {
+  INGRESOS
+  EGRESOS
+}
+
 // ============================================================
 // AUTH / USUARIOS
 // ============================================================
@@ -143,7 +148,8 @@ model Concepto {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
-  movimientos Movimiento[]
+  movimientos  Movimiento[]
+  presupuestos Presupuesto[]
 
   @@index([tipo, activo])
   @@map("conceptos")
@@ -526,6 +532,52 @@ model ReciboPago {
 // ============================================================
 // PLANTILLAS DOCUMENTALES (.docx maestros)
 // ============================================================
+
+// ============================================================
+// RESUMEN MENSUAL Y PRESUPUESTOS (Spec #7)
+// ============================================================
+
+model Presupuesto {
+  id           String   @id @default(cuid())
+  conceptoId   String
+  concepto     Concepto @relation(fields: [conceptoId], references: [id], onDelete: Cascade)
+  anio         Int
+  montoMensual Decimal  @db.Decimal(14, 2)
+  notas        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdById  String?  @db.Uuid
+  updatedById  String?  @db.Uuid
+
+  @@unique([conceptoId, anio])
+  @@index([anio])
+  @@map("presupuestos")
+}
+
+model SaldoAnualInicial {
+  anio        Int      @id
+  monto       Decimal  @db.Decimal(14, 2)
+  updatedAt   DateTime @updatedAt
+  createdById String?  @db.Uuid
+  updatedById String?  @db.Uuid
+
+  @@map("saldos_anuales_iniciales")
+}
+
+model NotaMensual {
+  id          String      @id @default(cuid())
+  anio        Int
+  mes         Int
+  seccion     SeccionNota
+  texto       String
+  updatedAt   DateTime    @updatedAt
+  createdById String?     @db.Uuid
+  updatedById String?     @db.Uuid
+
+  @@unique([anio, mes, seccion])
+  @@index([anio, mes])
+  @@map("notas_mensuales")
+}
 
 model PlantillaDocumento {
   id          String        @id @default(cuid())

@@ -1,6 +1,6 @@
 # Gestión ML — Handoff Document
 
-**Última actualización:** 2026-05-05
+**Última actualización:** 2026-05-06
 **Repo:** https://github.com/dann1103-eng/Gestion_ML
 **Producción:** Vercel Pro (URL en dashboard)
 **Base de datos:** Supabase Pro (proyecto `mnurqrryjjdyiufuxgtk`)
@@ -97,6 +97,17 @@ Este documento es la fuente de verdad para retomar el desarrollo en una sesión 
 - **Eliminación / anulación** en convenios, planillas BORRADOR, sesiones no REALIZADAS
 - **Login con password** + página `/perfil` para cambiar contraseña
 - **Script `pnpm create-user <email> <password>`** (admin via Supabase Auth API)
+
+### ✅ Spec #7 — Resumen mensual con Presupuestos
+- Modelos `Presupuesto`, `SaldoAnualInicial`, `NotaMensual` (+ enum `SeccionNota`)
+- `/resumen` con matriz Ingresos/Egresos/Saldos (8 cols resumen + 12 mensuales) replicando hoja Resumen del Excel
+- Edición inline de presupuesto y saldo año anterior (optimistic update con `useTransition`)
+- 6 gráficos con Recharts: tendencia, real vs presupuesto, saldo, composiciones donut, cumplimiento horizontal
+- Observaciones mensuales (`NotaMensual` por anio+mes+seccion) con auto-save al blur
+- `/presupuestos` para CRUD anual con totales mensual/anual
+- Exportación PDF (3 páginas: Ingresos, Egresos, Saldos+Observaciones) y XLSX con valores estáticos
+- CLI `pnpm import:presupuesto <ruta.xlsx> --anio YYYY [--dry-run]` con tabla de alias Excel→DB
+- Specs futuros relacionados (NO implementados): #8 aporte mensual esperado por donante, #9 vistas Control s/Club, #10 numerarios + automatización FESAL
 
 ### ✅ Spec #6.5 — Despliegue a producción
 - Repo en GitHub (privado)
@@ -336,6 +347,7 @@ mkdir -p prisma/migrations/$(date +%Y%m%d%H%M%S)_<descripcion>
 | `pnpm create-user <email> <password>` | Crear usuario admin |
 | `pnpm import:excel <ruta.xlsx> --config <cfg> [--dry-run]` | Importar movimientos del Excel |
 | `pnpm import:donantes` | Importar donantes |
+| `pnpm import:presupuesto <ruta.xlsx> --anio YYYY [--dry-run]` | Importar presupuesto desde hoja "Presupuesto 2025" del Excel |
 | `npx tsx --env-file=.env scripts/import/check-import.ts` | Resumen post-import por mes |
 
 ---

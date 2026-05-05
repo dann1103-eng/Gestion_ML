@@ -16,6 +16,7 @@
     "db:seed": "tsx --env-file=.env prisma/seed.ts",
     "import:excel": "tsx --env-file=.env scripts/import/import-excel.ts",
     "import:donantes": "tsx --env-file=.env scripts/import/import-donantes.ts",
+    "import:presupuesto": "tsx --env-file=.env scripts/import/import-presupuesto.ts",
     "create-user": "tsx --env-file=.env scripts/users/create-user.ts",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -48,6 +49,7 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.5",
     "react-hook-form": "^7.54.2",
+    "recharts": "^3.8.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"

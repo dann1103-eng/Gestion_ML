@@ -11,6 +11,7 @@ import {
   EstadoSesion,
   TipoPartida,
   EstadoPlanilla,
+  SeccionNota,
 } from "@prisma/client";
 
 // ----------------------------------------
@@ -260,3 +261,32 @@ export const partidaSchema = z.object({
   descripcion: opt(z.string().trim()),
 });
 export type PartidaInput = z.infer<typeof partidaSchema>;
+
+// ----------------------------------------
+// PRESUPUESTO / SALDO ANUAL / NOTA MENSUAL (Spec #7)
+// ----------------------------------------
+const decimalCualquiera = z
+  .string()
+  .regex(/^-?\d+(\.\d{1,2})?$/, "Monto inválido");
+
+export const presupuestoSchema = z.object({
+  conceptoId: z.string().min(1),
+  anio: z.coerce.number().int().min(2000).max(2100),
+  montoMensual: decimalCualquiera,
+  notas: stringOrNull,
+});
+export type PresupuestoInput = z.input<typeof presupuestoSchema>;
+
+export const saldoAnualInicialSchema = z.object({
+  anio: z.coerce.number().int().min(2000).max(2100),
+  monto: decimalCualquiera,
+});
+export type SaldoAnualInicialInput = z.input<typeof saldoAnualInicialSchema>;
+
+export const notaMensualSchema = z.object({
+  anio: z.coerce.number().int().min(2000).max(2100),
+  mes: z.coerce.number().int().min(1).max(12),
+  seccion: z.nativeEnum(SeccionNota),
+  texto: z.string().default(""),
+});
+export type NotaMensualInput = z.input<typeof notaMensualSchema>;

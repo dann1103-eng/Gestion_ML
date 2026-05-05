@@ -17,6 +17,8 @@ import {
   Handshake,
   CalendarClock,
   BookOpen,
+  TrendingUp,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +29,8 @@ const NAV_MAIN = [
   { href: "/empleados",                 label: "Empleados",      icon: UserRound                     },
   { href: "/cuentas",                   label: "Cuentas",        icon: Landmark                      },
   { href: "/planillas",                 label: "Planillas",      icon: Receipt                       },
+  { href: "/resumen",                   label: "Resumen",        icon: TrendingUp                    },
+  { href: "/presupuestos",              label: "Presupuestos",   icon: Wallet                        },
   { href: "/reportes",                  label: "Reportes",       icon: FileText                      },
   { href: "/cierre",                    label: "Cierre de mes",  icon: CalendarCheck                 },
   { href: "/conciliacion",              label: "Conciliación",   icon: GitMerge                      },
