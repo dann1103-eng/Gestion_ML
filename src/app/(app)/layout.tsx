@@ -47,9 +47,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
         {/* User footer */}
         <div className="px-4 py-4 border-t border-sidebar-border">
-          <p className="text-sidebar-muted text-xs truncate mb-2.5 font-sans">
+          <Link
+            href="/perfil"
+            className="text-sidebar-muted text-xs truncate mb-2.5 font-sans block hover:text-sidebar-text transition-colors"
+            title="Mi perfil"
+          >
             {user.email}
-          </p>
+          </Link>
           <form action="/auth/signout" method="post">
             <Button
               type="submit"
