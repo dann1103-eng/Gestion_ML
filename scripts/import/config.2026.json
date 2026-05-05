@@ -1,0 +1,47 @@
+{
+  "$schema": "Configuración de mapeo del Excel ML CAJA gestión 2026",
+  "anio": 2026,
+  "cuentaPorDefecto": "Caja Chica",
+  "hojas": {
+    "mensuales": [
+      "Enero", "Febrero", "Marzo", "Abril",
+      "Mayo", "Junio", "Julio", "Agosto",
+      "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ],
+    "ignorar": [
+      "Resumen", "Comprobación", "Datos Cambiables",
+      "Presupuesto 2025", "Presupuesto 2026",
+      "Dv pro", "Davivienda", "Serfinsa",
+      "Control s", "Control ax", "Control Club"
+    ]
+  },
+  "columnasMensuales": {
+    "fecha": ["Fecha"],
+    "vale": ["Vale No.", "Vale", "Vale No"],
+    "concepto": ["Concepto"],
+    "descripcion": ["Descripción", "Descripcion"],
+    "nombre": ["Nombre"],
+    "ingreso": ["Ingreso"],
+    "gasto": ["Gasto", "Egreso"]
+  },
+  "filaEncabezado": "auto",
+  "normalizacionMedio": {
+    "Banco": "TRANSFERENCIA",
+    "banco": "TRANSFERENCIA",
+    "Efectivo": "EFECTIVO",
+    "efectivo": "EFECTIVO",
+    "Cheque": "CHEQUE",
+    "Tarjeta": "TARJETA"
+  },
+  "conceptoPorDefectoIngreso": "Otros ingresos",
+  "conceptoPorDefectoEgreso": "Otros egresos",
+  "aliasConceptos": {
+    "Donaciones de s": "Donaciones de supernumerarios",
+    "Donaciones de cp": "Donaciones de cooperadores",
+    "Donaciones de cooperadores": "Donaciones de cooperadores",
+    "Donaciones de supernumerarios": "Donaciones de supernumerarios",
+    "Alquiler AFCyD": "Alquiler AFCYD",
+    "Aporte patronal (en AFCyD)": "Aporte patronal AFCYD",
+    "Arreglos y mantenimento": "Arreglos y mantenimiento"
+  }
+}

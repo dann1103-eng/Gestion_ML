@@ -28,6 +28,8 @@ type Config = {
   normalizacionMedio: Record<string, string>;
   conceptoPorDefectoIngreso: string;
   conceptoPorDefectoEgreso: string;
+  /** Mapa Excel → DB para conceptos abreviados o con typos */
+  aliasConceptos?: Record<string, string>;
 };
 
 type FilaMensual = {
@@ -139,11 +141,36 @@ async function main() {
   console.log(`   - Sin monto: ${stats.filasSinMonto}`);
   console.log(`   - Válidas: ${stats.filasOk}`);
 
+  // Aliases Excel → DB (necesario para diagnostic dry-run y para insert)
+  const aliases = config.aliasConceptos ?? {};
+  const aliasesNorm = new Map<string, string>();
+  for (const [excelName, dbName] of Object.entries(aliases)) {
+    aliasesNorm.set(excelName.toLowerCase().trim(), dbName.toLowerCase().trim());
+  }
+
   if (args.dryRun) {
-    console.log(`\n🧪 DRY-RUN: no se inserta nada. Saliendo.`);
-    if (stats.conceptosNoEncontrados.size > 0) {
-      console.log(`   Conceptos no encontrados (se mapearán al default):`);
-      for (const c of stats.conceptosNoEncontrados) console.log(`     - "${c}"`);
+    console.log(`\n🧪 DRY-RUN: no se inserta nada.`);
+    // Diagnóstico de conceptos
+    const matched = new Map<string, number>();
+    const unmatched = new Map<string, number>();
+    for (const f of filas) {
+      const excelKey = f.concepto.toLowerCase().trim();
+      const dbKey = aliasesNorm.get(excelKey) ?? excelKey;
+      if (conceptosByName.has(dbKey)) {
+        matched.set(f.concepto, (matched.get(f.concepto) ?? 0) + 1);
+      } else {
+        unmatched.set(f.concepto, (unmatched.get(f.concepto) ?? 0) + 1);
+      }
+    }
+    console.log(`\n   Conceptos OK (matchean DB):`);
+    for (const [c, n] of [...matched.entries()].sort((a, b) => b[1] - a[1])) {
+      console.log(`     ✓ "${c}" — ${n} mov.`);
+    }
+    if (unmatched.size > 0) {
+      console.log(`\n   ⚠ Conceptos sin match (irán a default):`);
+      for (const [c, n] of [...unmatched.entries()].sort((a, b) => b[1] - a[1])) {
+        console.log(`     ✗ "${c}" — ${n} mov.`);
+      }
     }
     return;
   }
@@ -151,10 +178,14 @@ async function main() {
   // Inserción idempotente
   let insertados = 0;
   let duplicados = 0;
+  let mapeoDefault = 0;
   for (const fila of filas) {
     const tipo = fila.ingreso > 0 ? TipoMovimiento.INGRESO : TipoMovimiento.EGRESO;
     const monto = fila.ingreso > 0 ? fila.ingreso : fila.gasto;
-    const conceptoMatch = conceptosByName.get(fila.concepto.toLowerCase());
+    const excelKey = fila.concepto.toLowerCase().trim();
+    const dbKey = aliasesNorm.get(excelKey) ?? excelKey;
+    const conceptoMatch = conceptosByName.get(dbKey);
+    if (!conceptoMatch) mapeoDefault++;
     const conceptoId =
       conceptoMatch?.id ??
       (tipo === TipoMovimiento.INGRESO ? conceptoIngresoDefault!.id : conceptoEgresoDefault!.id);
@@ -221,6 +252,9 @@ async function main() {
   console.log(`\n✅ Importación completa`);
   console.log(`   Insertados: ${insertados}`);
   console.log(`   Duplicados (saltados): ${duplicados}`);
+  if (mapeoDefault > 0) {
+    console.log(`   ⚠ Mapeados al concepto por defecto: ${mapeoDefault}`);
+  }
 }
 
 function parseHojaMensual(
