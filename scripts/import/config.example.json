@@ -1,0 +1,33 @@
+{
+  "$schema": "Configuración de mapeo del Excel ML CAJA gestión XXXX",
+  "anio": 2024,
+  "cuentaPorDefecto": "Caja Chica",
+  "hojas": {
+    "mensuales": [
+      "Enero", "Febrero", "Marzo", "Abril",
+      "Mayo", "Junio", "Julio", "Agosto",
+      "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ],
+    "ignorar": ["Resumen", "Comprobación", "Datos Cambiables", "Presupuesto 2024"]
+  },
+  "columnasMensuales": {
+    "fecha": ["Fecha"],
+    "vale": ["Vale No.", "Vale", "Vale No"],
+    "concepto": ["Concepto"],
+    "descripcion": ["Descripción", "Descripcion"],
+    "nombre": ["Nombre"],
+    "ingreso": ["Ingreso"],
+    "gasto": ["Gasto", "Egreso"]
+  },
+  "filaEncabezado": "auto",
+  "normalizacionMedio": {
+    "Banco": "TRANSFERENCIA",
+    "banco": "TRANSFERENCIA",
+    "Efectivo": "EFECTIVO",
+    "efectivo": "EFECTIVO",
+    "Cheque": "CHEQUE",
+    "Tarjeta": "TARJETA"
+  },
+  "conceptoPorDefectoIngreso": "Otros ingresos",
+  "conceptoPorDefectoEgreso": "Otros egresos"
+}

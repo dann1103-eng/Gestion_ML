@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Paleta: El Molino — Marino & Oro ────────────────────────────────── */
+    /* Azul marino: #1A3550 (fondo del escudo)  |  Oro: #F0AA1C (borde/texto) */
+
+    --background: 210 18% 97%;         /* blanco con matiz marino #F2F5F8 */
+    --foreground: 210 58% 10%;         /* tinta marino oscuro #0B1C2B */
+
+    --card: 0 0% 100%;                 /* blanco puro */
+    --card-foreground: 210 58% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 58% 10%;
+
+    --primary: 210 51% 21%;            /* marino logo #1A3550 */
+    --primary-foreground: 42 80% 95%; /* crema sobre marino */
+
+    --secondary: 210 28% 92%;          /* azul marino muy claro */
+    --secondary-foreground: 210 51% 21%;
+
+    --muted: 210 20% 94%;
+    --muted-foreground: 210 15% 48%;   /* gris-marino medio */
+
+    --accent: 42 80% 93%;              /* oro muy suave (hover) */
+    --accent-foreground: 210 51% 18%;
+
+    --destructive: 0 72% 40%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 22% 87%;             /* borde marino sutil */
+    --input: 210 22% 87%;
+    --ring: 42 87% 53%;                /* foco: oro del logo */
+    --radius: 0.5rem;
+
+    /* ── Sidebar: Marino profundo del logo ───────────────────────────────── */
+    --sidebar-bg: 210 52% 19%;         /* #162F47 marino profundo */
+    --sidebar-surface: 210 52% 15%;    /* #0F2437 un tono más oscuro */
+    --sidebar-text: 42 55% 94%;        /* #FAF4EA crema cálida */
+    --sidebar-muted: 210 22% 60%;      /* #7B95AB gris-marino medio */
+    --sidebar-accent: 42 87% 53%;      /* #F0AA1C oro del logo */
+    --sidebar-border: 210 52% 12%;     /* #0C1D2D borde muy oscuro */
+
+    /* ── Status ──────────────────────────────────────────────────────────── */
+    --income: 142 50% 28%;
+    --income-bg: 142 35% 92%;
+    --expense: 0 65% 38%;
+    --expense-bg: 0 55% 93%;
+  }
+
+  .dark {
+    --background: 210 40% 8%;
+    --foreground: 42 40% 93%;
+    --card: 210 40% 10%;
+    --card-foreground: 42 40% 93%;
+    --popover: 210 40% 10%;
+    --popover-foreground: 42 40% 93%;
+    --primary: 42 87% 53%;
+    --primary-foreground: 210 58% 10%;
+    --secondary: 210 35% 15%;
+    --secondary-foreground: 42 40% 88%;
+    --muted: 210 35% 13%;
+    --muted-foreground: 210 20% 58%;
+    --accent: 210 35% 15%;
+    --accent-foreground: 42 40% 88%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 35% 18%;
+    --input: 210 35% 18%;
+    --ring: 42 87% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans, 'Nunito', ui-sans-serif, sans-serif);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-serif, 'Lora', ui-serif, serif);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: hsl(var(--muted)); }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.35);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.55); }
+
+/* ── Transiciones globales ───────────────────────────────────────────────── */
+@layer components {
+  a, button { @apply transition-colors duration-150; }
+}

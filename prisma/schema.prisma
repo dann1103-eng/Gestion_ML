@@ -1,0 +1,541 @@
+// Centro Cultural El Molino — Plataforma Contable
+// Schema completo: contempla las tablas de los 5 specs desde el día 1.
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum TipoMovimiento {
+  INGRESO
+  EGRESO
+}
+
+enum TipoCuenta {
+  CAJA_CHICA
+  BANCO
+}
+
+enum TipoDonante {
+  COOPERADOR
+  SUPERNUMERARIO
+  EMPRESA_FE
+  OCASIONAL
+}
+
+enum EstadoDonante {
+  ACTIVO
+  PAUSADO
+  INACTIVO
+}
+
+enum Genero {
+  M
+  F
+  OTRO
+}
+
+enum MedioPago {
+  EFECTIVO
+  TRANSFERENCIA
+  CHEQUE
+  TARJETA
+  REMESA
+  OTRO
+}
+
+enum EstadoCierre {
+  ABIERTO
+  CERRADO
+}
+
+enum TipoCorrelativo {
+  INGR
+  EGR
+  AFCYD
+  RECIBO
+}
+
+enum ModalidadSesion {
+  PRESENCIAL
+  VIRTUAL
+  HIBRIDA
+}
+
+enum EstadoSesion {
+  PROGRAMADA
+  REALIZADA
+  CANCELADA
+}
+
+enum TipoPlan {
+  GOLD
+  SILVER
+  BRONCE
+}
+
+enum TipoPartida {
+  SUELDO
+  BONO
+  HORA_EXTRA
+  DESCUENTO_ISSS
+  DESCUENTO_AFP
+  DESCUENTO_ISR
+  DESCUENTO_OTRO
+}
+
+enum EstadoPlanilla {
+  BORRADOR
+  APROBADA
+  PAGADA
+}
+
+enum TipoPlantilla {
+  CONVENIO
+  RECIBO_DONANTE
+  RECIBO_PAGO
+  OTRO
+}
+
+// ============================================================
+// AUTH / USUARIOS
+// ============================================================
+
+model Usuario {
+  id        String   @id @db.Uuid // mismo id que auth.users de Supabase
+  email     String   @unique
+  nombre    String
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movsCreados      Movimiento[] @relation("MovCreatedBy")
+  movsActualizados Movimiento[] @relation("MovUpdatedBy")
+  donantesCreados  Donante[]    @relation("DonCreatedBy")
+  donantesActualiz Donante[]    @relation("DonUpdatedBy")
+  adjuntos         Adjunto[]
+  cierres          CierreMes[]
+
+  @@map("usuarios")
+}
+
+// ============================================================
+// CATÁLOGOS
+// ============================================================
+
+model Concepto {
+  id          String         @id @default(cuid())
+  nombre      String         @unique
+  tipo        TipoMovimiento
+  generaAfcyd Boolean        @default(false)
+  activo      Boolean        @default(true)
+  orden       Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  movimientos Movimiento[]
+
+  @@index([tipo, activo])
+  @@map("conceptos")
+}
+
+model Clasificacion {
+  id     String  @id @default(cuid())
+  nombre String  @unique
+  activo Boolean @default(true)
+  orden  Int     @default(0)
+
+  movimientos Movimiento[]
+
+  @@map("clasificaciones")
+}
+
+// ============================================================
+// CUENTAS
+// ============================================================
+
+model Cuenta {
+  id            String     @id @default(cuid())
+  nombre        String
+  tipo          TipoCuenta
+  banco         String?
+  numeroCuenta  String?
+  saldoInicial  Decimal    @default(0) @db.Decimal(14, 2)
+  fechaSaldoIni DateTime   @default(now())
+  activo        Boolean    @default(true)
+  orden         Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  movimientos Movimiento[]
+
+  @@index([tipo, activo])
+  @@map("cuentas")
+}
+
+// ============================================================
+// DONANTES
+// ============================================================
+
+model Donante {
+  id                  String        @id @default(cuid())
+  tipo                TipoDonante
+  nombre              String
+  dui                 String?
+  nit                 String?
+  fechaNacimiento     DateTime?
+  genero              Genero?
+  profesion           String?
+  telefonoPrincipal   String?
+  telefonoSecundario  String?
+  correo              String?
+  direccion           String?
+  ciudad              String?
+  departamento        String?
+  entregaReciboFiscal Boolean       @default(false)
+  estado              EstadoDonante @default(ACTIVO)
+  fechaAlta           DateTime      @default(now())
+  fechaBaja           DateTime?
+  notas               String?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  createdById         String?       @db.Uuid
+  createdBy           Usuario?      @relation("DonCreatedBy", fields: [createdById], references: [id])
+  updatedById         String?       @db.Uuid
+  updatedBy           Usuario?      @relation("DonUpdatedBy", fields: [updatedById], references: [id])
+
+  empresaDetalle   EmpresaDetalle?
+  movimientos      Movimiento[]
+  movimientosAfcyd MovimientoAfcyd[]
+  convenios        Convenio[]
+
+  @@index([tipo, estado])
+  @@index([dui])
+  @@index([nit])
+  @@index([nombre])
+  @@map("donantes")
+}
+
+model EmpresaDetalle {
+  id                       String    @id @default(cuid())
+  donanteId                String    @unique
+  donante                  Donante   @relation(fields: [donanteId], references: [id], onDelete: Cascade)
+  razonSocial              String?
+  nitEmpresa               String?
+  nrc                      String?
+  giro                     String?
+  rubro                    String?
+  personeria               String?
+  representanteLegal       String?
+  planFE                   TipoPlan?
+  fechaInicioConvenio      DateTime?
+  fechaVencimientoConvenio DateTime?
+  notas                    String?
+
+  @@map("empresa_detalle")
+}
+
+// ============================================================
+// MOVIMIENTOS
+// ============================================================
+
+model Movimiento {
+  id              String         @id @default(cuid())
+  fecha           DateTime
+  tipo            TipoMovimiento
+  conceptoId      String
+  concepto        Concepto       @relation(fields: [conceptoId], references: [id])
+  clasificacionId String?
+  clasificacion   Clasificacion? @relation(fields: [clasificacionId], references: [id])
+  cuentaId        String
+  cuenta          Cuenta         @relation(fields: [cuentaId], references: [id])
+  monto           Decimal        @db.Decimal(14, 2)
+  medioPago       MedioPago      @default(EFECTIVO)
+  descripcion     String
+  donanteId       String?
+  donante         Donante?       @relation(fields: [donanteId], references: [id])
+  valeNumero      String         @unique
+  notas           String?
+  anulado         Boolean        @default(false)
+  motivoAnulacion String?
+  conciliado      Boolean        @default(false)
+  importHash      String?        @unique
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdById String?  @db.Uuid
+  createdBy   Usuario? @relation("MovCreatedBy", fields: [createdById], references: [id])
+  updatedById String?  @db.Uuid
+  updatedBy   Usuario? @relation("MovUpdatedBy", fields: [updatedById], references: [id])
+
+  adjuntos        Adjunto[]
+  movimientoAfcyd MovimientoAfcyd?
+
+  @@index([fecha])
+  @@index([tipo, fecha])
+  @@index([cuentaId, fecha])
+  @@index([donanteId])
+  @@index([conceptoId])
+  @@index([anulado])
+  @@map("movimientos")
+}
+
+model MovimientoAfcyd {
+  id             String     @id @default(cuid())
+  movimientoId   String     @unique
+  movimiento     Movimiento @relation(fields: [movimientoId], references: [id], onDelete: Cascade)
+  fecha          DateTime
+  donanteId      String
+  donante        Donante    @relation(fields: [donanteId], references: [id])
+  monto          Decimal    @db.Decimal(14, 2)
+  medio          MedioPago
+  notas          String?
+  // snapshot del donante al momento de generar el AFCYD
+  snapshotDui    String?
+  snapshotNombre String
+  snapshotCorreo String?
+  snapshotNit    String?
+  correlativo    String     @unique
+  anulado        Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+
+  @@index([fecha])
+  @@index([donanteId])
+  @@index([anulado])
+  @@map("movimientos_afcyd")
+}
+
+// ============================================================
+// ADJUNTOS
+// ============================================================
+
+model Adjunto {
+  id             String     @id @default(cuid())
+  movimientoId   String
+  movimiento     Movimiento @relation(fields: [movimientoId], references: [id], onDelete: Cascade)
+  storagePath    String
+  nombreOriginal String
+  mimeType       String
+  tamanoBytes   Int
+  uploadedById   String?    @db.Uuid
+  uploadedBy     Usuario?   @relation(fields: [uploadedById], references: [id])
+  uploadedAt     DateTime   @default(now())
+
+  @@index([movimientoId])
+  @@map("adjuntos")
+}
+
+// ============================================================
+// CIERRE Y CORRELATIVO
+// ============================================================
+
+model CierreMes {
+  id           String       @id @default(cuid())
+  mes          Int
+  anio         Int
+  estado       EstadoCierre @default(ABIERTO)
+  cerradoPorId String?      @db.Uuid
+  cerradoPor   Usuario?     @relation(fields: [cerradoPorId], references: [id])
+  cerradoAt    DateTime?
+  notas        String?
+
+  @@unique([mes, anio])
+  @@map("cierres_mes")
+}
+
+model Correlativo {
+  id           String          @id @default(cuid())
+  tipo         TipoCorrelativo
+  anio         Int
+  mes          Int
+  ultimoNumero Int             @default(0)
+  updatedAt    DateTime        @updatedAt
+
+  @@unique([tipo, anio, mes])
+  @@map("correlativos")
+}
+
+// ============================================================
+// FORMACIÓN EMPRESARIAL (Spec #3 — schema ya creado, tablas vacías hasta su spec)
+// ============================================================
+
+model Plan {
+  id                   String  @id @default(cuid())
+  tipo                 TipoPlan @unique
+  nombre               String
+  precio               Decimal @db.Decimal(14, 2)
+  cantidadConferencias Int
+  horasCoaching        Int     @default(0)
+  descuentoExtras      Decimal @default(0) @db.Decimal(5, 2)
+  vigente              Boolean @default(true)
+
+  convenios Convenio[]
+
+  @@map("planes")
+}
+
+model ConferenciaCatalogo {
+  id          String   @id @default(cuid())
+  codigo      String   @unique
+  titulo      String
+  categoria   String
+  descripcion String?
+  duracionMin Int      @default(60)
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  sesiones Sesion[]
+
+  @@index([categoria, activo])
+  @@map("conferencias_catalogo")
+}
+
+model Convenio {
+  id              String   @id @default(cuid())
+  donanteId       String
+  donante         Donante  @relation(fields: [donanteId], references: [id])
+  planId          String
+  plan            Plan     @relation(fields: [planId], references: [id])
+  version         Int      @default(1)
+  fechaFirma      DateTime
+  fechaInicio     DateTime
+  fechaFin        DateTime
+  montoTotal      Decimal  @db.Decimal(14, 2)
+  ciudadFirma     String?
+  urlDocxGenerado String?
+  urlPdfGenerado  String?
+  notas           String?
+  anulado         Boolean  @default(false)
+  motivoAnulacion String?
+  createdAt       DateTime @default(now())
+
+  sesiones Sesion[]
+
+  @@index([donanteId])
+  @@index([fechaFin])
+  @@map("convenios")
+}
+
+model Sesion {
+  id            String              @id @default(cuid())
+  convenioId    String
+  convenio      Convenio            @relation(fields: [convenioId], references: [id])
+  conferenciaId String
+  conferencia   ConferenciaCatalogo @relation(fields: [conferenciaId], references: [id])
+  fecha         DateTime
+  modalidad     ModalidadSesion
+  ponente       String?
+  asistentes    Int                 @default(0)
+  estado        EstadoSesion        @default(PROGRAMADA)
+  notas         String?
+
+  @@index([convenioId, fecha])
+  @@index([fecha, estado])
+  @@map("sesiones")
+}
+
+// ============================================================
+// PLANILLA Y RECIBOS (Spec #4 — schema creado, vacío hasta su spec)
+// ============================================================
+
+model Empleado {
+  id           String    @id @default(cuid())
+  nombre       String
+  dui          String?   @unique
+  nit          String?
+  isss         String?
+  afp          String?
+  cargo        String?
+  sueldoBase   Decimal   @db.Decimal(14, 2)
+  fechaIngreso DateTime
+  fechaSalida  DateTime?
+  cuentaBanco  String?
+  activo       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  partidas PartidaPlanilla[]
+  recibos  ReciboPago[]
+
+  @@map("empleados")
+}
+
+model Planilla {
+  id              String         @id @default(cuid())
+  anio            Int
+  mes             Int
+  quincena        Int
+  fechaInicio     DateTime
+  fechaFin        DateTime
+  fechaPago       DateTime
+  medioPago       MedioPago      @default(EFECTIVO)
+  totalBruto      Decimal        @default(0) @db.Decimal(14, 2)
+  totalDescuentos Decimal        @default(0) @db.Decimal(14, 2)
+  totalNeto       Decimal        @default(0) @db.Decimal(14, 2)
+  estado          EstadoPlanilla @default(BORRADOR)
+  createdAt       DateTime       @default(now())
+
+  partidas PartidaPlanilla[]
+  recibos  ReciboPago[]
+
+  @@unique([anio, mes, quincena])
+  @@map("planillas")
+}
+
+model PartidaPlanilla {
+  id          String      @id @default(cuid())
+  planillaId  String
+  planilla    Planilla    @relation(fields: [planillaId], references: [id], onDelete: Cascade)
+  empleadoId  String
+  empleado    Empleado    @relation(fields: [empleadoId], references: [id])
+  tipo        TipoPartida
+  monto       Decimal     @db.Decimal(14, 2)
+  descripcion String?
+
+  @@index([planillaId, empleadoId])
+  @@map("partidas_planilla")
+}
+
+model ReciboPago {
+  id             String    @id @default(cuid())
+  planillaId     String
+  planilla       Planilla  @relation(fields: [planillaId], references: [id])
+  empleadoId     String
+  empleado       Empleado  @relation(fields: [empleadoId], references: [id])
+  montoNeto      Decimal   @db.Decimal(14, 2)
+  medioPago      MedioPago @default(EFECTIVO)
+  fechaFirma     DateTime?
+  urlPdfGenerado String?
+  correlativo    String?   @unique
+  createdAt      DateTime  @default(now())
+
+  @@index([planillaId, empleadoId])
+  @@map("recibos_pago")
+}
+
+// ============================================================
+// PLANTILLAS DOCUMENTALES (.docx maestros)
+// ============================================================
+
+model PlantillaDocumento {
+  id          String        @id @default(cuid())
+  tipo        TipoPlantilla
+  nombre      String
+  storagePath String
+  version     Int           @default(1)
+  activa      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+
+  @@unique([tipo, version])
+  @@map("plantillas_documento")
+}
