@@ -196,6 +196,7 @@ export default async function MovimientosPage({
                 <TableHead>Fecha</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Concepto</TableHead>
+                <TableHead>Descripción</TableHead>
                 <TableHead>Cuenta</TableHead>
                 <TableHead>Donante</TableHead>
                 <TableHead className="text-right">Monto</TableHead>
@@ -214,6 +215,16 @@ export default async function MovimientosPage({
                     </Badge>
                   </TableCell>
                   <TableCell>{m.concepto.nombre}</TableCell>
+                  <TableCell className="max-w-[260px]">
+                    <span className="block truncate text-sm" title={m.descripcion ?? ""}>
+                      {m.descripcion || "—"}
+                    </span>
+                    {m.notas ? (
+                      <span className="block text-[11px] text-muted-foreground truncate" title={m.notas}>
+                        {m.notas}
+                      </span>
+                    ) : null}
+                  </TableCell>
                   <TableCell className="text-xs">{m.cuenta.nombre}</TableCell>
                   <TableCell className="text-xs">{m.donante?.nombre ?? "—"}</TableCell>
                   <TableCell className="text-right font-medium">
@@ -235,7 +246,7 @@ export default async function MovimientosPage({
               ))}
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
                     Sin movimientos en este período.
                   </TableCell>
                 </TableRow>

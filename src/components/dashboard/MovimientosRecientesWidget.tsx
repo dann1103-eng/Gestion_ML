@@ -42,7 +42,19 @@ export function MovimientosRecientesWidget({ movimientos }: Props) {
           movimientos.slice(0, 6).map((m) => {
             const esIngreso = m.tipo === "INGRESO";
             const monto = Number(m.monto);
-            const titulo = m.donante?.nombre ?? m.concepto.nombre;
+            // Título principal: descripción (lo más informativo).
+            // Si no hay descripción, usa donante o concepto como fallback.
+            const titulo =
+              (m.descripcion && m.descripcion.trim()) ||
+              m.donante?.nombre ||
+              m.concepto.nombre;
+            // Subtítulo: concepto + donante (si ambos existen y no están en el título)
+            const subtitulo = [
+              m.concepto.nombre,
+              m.donante?.nombre && m.donante.nombre !== titulo ? m.donante.nombre : null,
+            ]
+              .filter(Boolean)
+              .join(" · ");
             return (
               <div key={m.id} className="flex items-center gap-3 group">
                 <span
@@ -57,10 +69,11 @@ export function MovimientosRecientesWidget({ movimientos }: Props) {
                 </span>
 
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-foreground truncate">{titulo}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">
-                    {m.concepto.nombre}
-                    {m.donante ? "" : null}
+                  <p className="text-xs font-semibold text-foreground truncate" title={titulo}>
+                    {titulo}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground truncate" title={subtitulo}>
+                    {subtitulo}
                   </p>
                 </div>
 
