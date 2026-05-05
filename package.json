@@ -16,6 +16,7 @@
     "db:seed": "tsx --env-file=.env prisma/seed.ts",
     "import:excel": "tsx --env-file=.env scripts/import/import-excel.ts",
     "import:donantes": "tsx --env-file=.env scripts/import/import-donantes.ts",
+    "create-user": "tsx --env-file=.env scripts/users/create-user.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts"

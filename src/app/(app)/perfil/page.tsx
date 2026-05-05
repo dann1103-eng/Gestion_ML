@@ -12,7 +12,7 @@ export default async function PerfilPage() {
       <header>
         <h1 className="font-serif text-3xl font-semibold tracking-tight">Mi perfil</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Configura tu contraseña para iniciar sesión sin enlace mágico.
+          Cambia tu contraseña cuando lo necesites.
         </p>
       </header>
 
@@ -30,9 +30,9 @@ export default async function PerfilPage() {
       </Card>
 
       <Card className="p-6">
-        <h2 className="font-semibold mb-1">Contraseña</h2>
+        <h2 className="font-semibold mb-1">Cambiar contraseña</h2>
         <p className="text-sm text-muted-foreground mb-4">
-          Si es tu primera vez, ingresa una nueva contraseña abajo. Si ya tenías una y la quieres cambiar, también ingresa la nueva.
+          Mínimo 8 caracteres. Una vez guardada, la usarás para iniciar sesión.
         </p>
         <CambiarPasswordForm />
       </Card>
