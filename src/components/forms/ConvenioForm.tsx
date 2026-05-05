@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -186,9 +187,9 @@ export function ConvenioForm({
             {empresas.length === 0 ? (
               <p className="text-xs text-muted-foreground mt-1">
                 No hay donantes con tipo Empresa FE.{" "}
-                <a href="/donantes/nuevo" className="text-primary hover:underline">
+                <Link href="/donantes/nuevo" className="text-primary hover:underline">
                   Crear nueva empresa →
-                </a>
+                </Link>
               </p>
             ) : null}
             {e("donanteId") ? (

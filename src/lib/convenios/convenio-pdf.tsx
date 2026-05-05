@@ -227,7 +227,7 @@ export function ConvenioPDF({ data, generadoPor, fechaGeneracion }: Props) {
             <Text style={bold}>Banco de contactos:</Text> posibilidad de acceso a una red de personas recomendadas de El Molino para contrataciones, según requerimientos.
           </Text>
           <Text style={[parrafo, { marginTop: 6 }]}>
-            <Text style={bold}>Conferencias personalizadas:</Text> el donante puede optar por impartir una de las conferencias que le corresponden en el mes en la institución educativa de sus hijos, en su casa para un grupo de amistades, o en El Molino, para padres de compañeros de sus hijos, amigos o parientes. En el caso de varones, la conferencia puede dirigirse a ellos y sus amigos, con la variedad de temas de "The Mark". Esta opción es ideal para profesionales independientes o pequeños empresarios, y está sujeta a restricciones (debe realizarse en Santa Ana, con un límite de 20 participantes, entre otras).
+            <Text style={bold}>Conferencias personalizadas:</Text> el donante puede optar por impartir una de las conferencias que le corresponden en el mes en la institución educativa de sus hijos, en su casa para un grupo de amistades, o en El Molino, para padres de compañeros de sus hijos, amigos o parientes. En el caso de varones, la conferencia puede dirigirse a ellos y sus amigos, con la variedad de temas de «The Mark». Esta opción es ideal para profesionales independientes o pequeños empresarios, y está sujeta a restricciones (debe realizarse en Santa Ana, con un límite de 20 participantes, entre otras).
           </Text>
         </View>
 
