@@ -78,6 +78,7 @@ export function DonanteForm({ initial, onSubmit, redirectTo, submitLabel = "Guar
             >
               <option value="COOPERADOR">Cooperador</option>
               <option value="SUPERNUMERARIO">Supernumerario</option>
+              <option value="NUMERARIO">Numerario</option>
               <option value="EMPRESA_FE">Empresa (Formación Empresarial)</option>
               <option value="OCASIONAL">Donante ocasional</option>
             </Select>
@@ -253,7 +254,7 @@ export function DonanteForm({ initial, onSubmit, redirectTo, submitLabel = "Guar
         </Card>
       ) : null}
 
-      {(tipo === "COOPERADOR" || tipo === "SUPERNUMERARIO") && (
+      {(tipo === "COOPERADOR" || tipo === "SUPERNUMERARIO" || tipo === "NUMERARIO") && (
         <Card>
           <CardHeader>
             <CardTitle>Aporte mensual esperado</CardTitle>

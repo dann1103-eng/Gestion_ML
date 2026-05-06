@@ -19,6 +19,7 @@ import {
   BookOpen,
   TrendingUp,
   Wallet,
+  ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,7 @@ const NAV_MAIN = [
   { href: "/presupuestos",              label: "Presupuestos",   icon: Wallet                        },
   { href: "/reportes",                  label: "Reportes",       icon: FileText                      },
   { href: "/cierre",                    label: "Cierre de mes",  icon: CalendarCheck                 },
+  { href: "/control/numerarios",        label: "Control numerarios", icon: ListChecks                },
   { href: "/conciliacion",              label: "Conciliación",   icon: GitMerge                      },
   { href: "/catalogos/conceptos",       label: "Conceptos",      icon: Tag                           },
   { href: "/catalogos/clasificaciones", label: "Clasificaciones",icon: Layers                        },

@@ -20,6 +20,7 @@ const TIPO_LABEL: Record<TipoDonante, string> = {
   SUPERNUMERARIO: "Supernumerario",
   EMPRESA_FE: "Empresa FE",
   OCASIONAL: "Ocasional",
+  NUMERARIO: "Numerario",
 };
 
 export default async function DonantesPage({

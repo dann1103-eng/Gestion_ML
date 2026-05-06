@@ -42,6 +42,7 @@ const CONCEPTOS_EGRESO: string[] = [
   "Actividades sg",
   "Actividades Universitarios",
   "Préstamos",
+  "Pensión a FESAL",
   "Otros egresos",
 ];
 

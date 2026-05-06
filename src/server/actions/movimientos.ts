@@ -9,6 +9,7 @@ import {
 import { runAction } from "./helpers";
 import { generarCorrelativo } from "@/lib/correlativo";
 import { generarAfcydSiCorresponde, anularAfcyd } from "@/lib/afcyd";
+import { generarEgresoFesalSiCorresponde } from "@/lib/fesal";
 import { TipoCorrelativo, TipoMovimiento, Prisma } from "@prisma/client";
 
 export type MovimientoFilters = {
@@ -96,6 +97,7 @@ export async function obtenerMovimiento(id: string) {
  */
 export async function crearMovimiento(formData: FormData) {
   const raw = Object.fromEntries(formData.entries());
+  const generarFesal = formData.get("generarFesal") === "true";
   const result = await runAction(movimientoSchema, raw, async (data, userId) => {
     const movimiento = await prisma.$transaction(async (tx) => {
       const tipoCorr =
@@ -131,6 +133,17 @@ export async function crearMovimiento(formData: FormData) {
         notas: m.notas,
         donanteId: m.donanteId,
       });
+
+      if (generarFesal) {
+        await generarEgresoFesalSiCorresponde(tx, {
+          id: m.id,
+          tipo: m.tipo,
+          fecha: m.fecha,
+          monto: m.monto,
+          cuentaId: m.cuentaId,
+          donanteId: m.donanteId,
+        });
+      }
 
       return m;
     });

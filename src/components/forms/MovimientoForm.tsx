@@ -185,6 +185,19 @@ export function MovimientoForm({
             <p className="text-xs text-muted-foreground mt-1">
               Si el donante tiene activado &quot;entrega recibo fiscal&quot;, se generará automáticamente un registro AFCYD.
             </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Si el donante es <strong>numerario</strong>, también se generará automáticamente un egreso espejo a FESAL por el mismo monto.
+            </p>
+            <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                name="generarFesal"
+                value="true"
+                defaultChecked
+                className="rounded border-input"
+              />
+              Generar egreso espejo a FESAL (sólo para numerarios)
+            </label>
           </div>
 
           <div className="md:col-span-2">
