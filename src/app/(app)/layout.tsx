@@ -8,9 +8,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const user = await requireUser();
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* ── Sidebar ────────────────────────────────────────────────────── */}
-      <aside className="w-64 flex-shrink-0 flex flex-col bg-sidebar border-r border-sidebar-border">
+      <aside className="w-64 flex-shrink-0 flex flex-col bg-sidebar border-r border-sidebar-border h-screen sticky top-0">
 
         {/* Brand */}
         <div className="px-5 py-6 border-b border-sidebar-border">
