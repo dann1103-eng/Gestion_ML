@@ -1,10 +1,12 @@
 -- Permitir mismo nombre de concepto en INGRESO y EGRESO (ej. "Actividades Club")
--- 1) Quitar unique en nombre, crear unique compuesto (nombre, tipo)
-ALTER TABLE "conceptos" DROP CONSTRAINT IF EXISTS "conceptos_nombre_key";
+-- 1) Quitar el unique index de "nombre" (Prisma @unique crea INDEX, no CONSTRAINT)
+DROP INDEX IF EXISTS "conceptos_nombre_key";
+
+-- 2) Crear unique compuesto (nombre, tipo)
 CREATE UNIQUE INDEX IF NOT EXISTS "conceptos_nombre_tipo_key" ON "conceptos" ("nombre", "tipo");
 
--- 2) Insertar versiones EGRESO de los conceptos compartidos.
---    Se hace UPSERT manual: si ya existe (nombre, tipo=EGRESO), no insertamos.
+-- 3) Insertar versiones EGRESO de los conceptos compartidos en el Excel.
+--    Sólo si todavía no existe la versión EGRESO con ese nombre.
 INSERT INTO "conceptos" ("id", "nombre", "tipo", "generaAfcyd", "activo", "orden", "createdAt", "updatedAt")
 SELECT
   'cseed_' || md5("nombre" || '_egreso'),
@@ -23,7 +25,7 @@ WHERE c."tipo" = 'INGRESO'
     WHERE c2."nombre" = c."nombre" AND c2."tipo" = 'EGRESO'
   );
 
--- 3) Reasignar movimientos EGRESO que apuntan al concepto INGRESO compartido,
+-- 4) Reasignar movimientos EGRESO que apuntan al concepto INGRESO compartido
 --    al nuevo concepto EGRESO con el mismo nombre.
 UPDATE "movimientos" m
 SET "conceptoId" = (
@@ -40,8 +42,8 @@ WHERE m."tipo" = 'EGRESO'
       AND "nombre" IN ('Actividades Club', 'Actividades sg', 'Actividades Universitarios')
   );
 
--- 4) Inversamente: movimientos INGRESO que apuntan a un concepto EGRESO con el mismo nombre,
---    reasignarlos al INGRESO. (Caso menos probable pero mejor cubrirlo)
+-- 5) Inversamente: movimientos INGRESO apuntando a un concepto EGRESO compartido
+--    se reasignan al INGRESO. (Cubrir caso simétrico.)
 UPDATE "movimientos" m
 SET "conceptoId" = (
   SELECT cnew."id"
