@@ -109,6 +109,26 @@ Este documento es la fuente de verdad para retomar el desarrollo en una sesión 
 - CLI `pnpm import:presupuesto <ruta.xlsx> --anio YYYY [--dry-run]` con tabla de alias Excel→DB
 - Specs futuros relacionados (NO implementados): #8 aporte mensual esperado por donante, #9 vistas Control s/Club, #10 numerarios + automatización FESAL
 
+### ✅ Spec #8 — Aporte mensual esperado por donante
+- Campo `Donante.aporteMensualEsperado` (Decimal opcional)
+- Form de Donante muestra el campo sólo para tipos COOPERADOR / SUPERNUMERARIO / NUMERARIO
+- `lib/donantes/al-dia.ts`: `cumplimientoDonanteAnual()` y `donantesAtrasados()`
+- Calendario de cumplimiento mensual en `/donantes/[id]` (12 meses con ✓/✗/—)
+- Alerta nueva `donante-atrasado` en AlertasWidget (≥2 meses consecutivos)
+
+### ✅ Spec #10 — Numerarios + automatización FESAL
+- Tipo `NUMERARIO` en enum `TipoDonante`
+- Concepto seed nuevo: `Pensión a FESAL`
+- Al crear ingreso de un numerario, opcionalmente se genera egreso espejo a FESAL (checkbox en form, default ON)
+- `lib/fesal.ts: generarEgresoFesalSiCorresponde()`
+- `/control/numerarios` con doble matriz: aportes a caja y pagos a FESAL
+
+### ✅ Spec #9 — Vistas Control supernumerarios/cp y Club
+- `lib/control/queries.ts: getControl()` — matriz Donante × Mes parametrizada por tipos
+- `/control/supernumerarios` (combina SUPERNUMERARIO + COOPERADOR como en Excel)
+- `/control/club` (donantes OCASIONAL — usar para socios del Club)
+- Componente reutilizable `ControlMatriz` con semáforo de cumplimiento
+
 ### ✅ Spec #6.5 — Despliegue a producción
 - Repo en GitHub (privado)
 - Vercel Pro conectado, auto-deploy desde `main`
