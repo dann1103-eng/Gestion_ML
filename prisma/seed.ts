@@ -22,6 +22,7 @@ const CONCEPTOS_INGRESO: { nombre: string; generaAfcyd: boolean }[] = [
   { nombre: "Actividades Club", generaAfcyd: false },
   { nombre: "Actividades sg", generaAfcyd: false },
   { nombre: "Actividades Universitarios", generaAfcyd: false },
+  { nombre: "Fondo de Tejares", generaAfcyd: false },
   { nombre: "Otros ingresos", generaAfcyd: false },
 ];
 

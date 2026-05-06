@@ -20,8 +20,6 @@ const ALIAS_CONCEPTOS: Record<string, string> = {
   "Aporte patronal (en AFCyD)": "Aporte patronal AFCYD",
   "Arreglos y mantenimento": "Arreglos y mantenimiento",
   "Alquiler AFCyD": "Alquiler AFCYD",
-  "Fondo de Tejares": "Otros ingresos",
-  "Fondo de Tejares ": "Otros ingresos",
 };
 
 const HOJA = "Presupuesto 2025";
