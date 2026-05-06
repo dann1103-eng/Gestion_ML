@@ -46,7 +46,7 @@ export async function getControl({
   });
 
   const conceptoFesal = await prisma.concepto.findUnique({
-    where: { nombre: CONCEPTO_FESAL },
+    where: { nombre_tipo: { nombre: CONCEPTO_FESAL, tipo: TipoMovimiento.EGRESO } },
     select: { id: true },
   });
 

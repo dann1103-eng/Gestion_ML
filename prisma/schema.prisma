@@ -141,7 +141,7 @@ model Usuario {
 
 model Concepto {
   id          String         @id @default(cuid())
-  nombre      String         @unique
+  nombre      String
   tipo        TipoMovimiento
   generaAfcyd Boolean        @default(false)
   activo      Boolean        @default(true)
@@ -152,6 +152,7 @@ model Concepto {
   movimientos  Movimiento[]
   presupuestos Presupuesto[]
 
+  @@unique([nombre, tipo])
   @@index([tipo, activo])
   @@map("conceptos")
 }

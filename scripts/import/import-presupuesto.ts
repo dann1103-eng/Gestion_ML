@@ -62,7 +62,10 @@ async function main() {
   }
 
   const conceptos = await prisma.concepto.findMany();
-  const conceptoPorNombre = new Map(conceptos.map((c) => [c.nombre, c]));
+  // Index por (nombre+tipo) — puede haber duplicados de nombre
+  const conceptoPorNombreTipo = new Map(
+    conceptos.map((c) => [`${c.nombre}|${c.tipo}`, c]),
+  );
 
   type Item = {
     nombreExcel: string;
@@ -82,15 +85,9 @@ async function main() {
       const monto = extraerMonto(montoCell);
       if (monto === null) continue;
       const nombreDB = ALIAS_CONCEPTOS[nombreExcel] ?? nombreExcel;
-      const concepto = conceptoPorNombre.get(nombreDB);
+      const concepto = conceptoPorNombreTipo.get(`${nombreDB}|${tipo}`);
       if (!concepto) {
-        noResueltos.push(`${nombreExcel} (DB: ${nombreDB}) — fila ${r} ${tipo}`);
-        continue;
-      }
-      if (concepto.tipo !== tipo) {
-        noResueltos.push(
-          `${nombreExcel}: tipo concepto ${concepto.tipo} ≠ esperado ${tipo}`,
-        );
+        noResueltos.push(`${nombreExcel} (DB: ${nombreDB} ${tipo}) — fila ${r}`);
         continue;
       }
       items.push({
@@ -126,7 +123,7 @@ async function main() {
   let creados = 0;
   let actualizados = 0;
   for (const it of items) {
-    const concepto = conceptoPorNombre.get(it.nombreDB)!;
+    const concepto = conceptoPorNombreTipo.get(`${it.nombreDB}|${it.tipo}`)!;
     const existing = await prisma.presupuesto.findUnique({
       where: { conceptoId_anio: { conceptoId: concepto.id, anio: args.anio! } },
     });

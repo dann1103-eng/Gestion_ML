@@ -98,18 +98,18 @@ async function main() {
     exit(1);
   }
 
-  // Cache de catálogos
+  // Cache de catálogos — indexado por (nombre+tipo) porque puede haber duplicados
   const conceptos = await prisma.concepto.findMany();
-  const conceptosByName = new Map<string, (typeof conceptos)[number]>();
+  const conceptosByNameTipo = new Map<string, (typeof conceptos)[number]>();
   for (const c of conceptos) {
-    conceptosByName.set(c.nombre.toLowerCase(), c);
+    conceptosByNameTipo.set(`${c.nombre.toLowerCase()}|${c.tipo}`, c);
   }
 
-  const conceptoIngresoDefault = conceptosByName.get(
-    config.conceptoPorDefectoIngreso.toLowerCase(),
+  const conceptoIngresoDefault = conceptosByNameTipo.get(
+    `${config.conceptoPorDefectoIngreso.toLowerCase()}|INGRESO`,
   );
-  const conceptoEgresoDefault = conceptosByName.get(
-    config.conceptoPorDefectoEgreso.toLowerCase(),
+  const conceptoEgresoDefault = conceptosByNameTipo.get(
+    `${config.conceptoPorDefectoEgreso.toLowerCase()}|EGRESO`,
   );
 
   if (!args.dryRun && (!conceptoIngresoDefault || !conceptoEgresoDefault)) {
@@ -154,12 +154,13 @@ async function main() {
     const matched = new Map<string, number>();
     const unmatched = new Map<string, number>();
     for (const f of filas) {
+      const tipo = f.ingreso > 0 ? "INGRESO" : "EGRESO";
       const excelKey = f.concepto.toLowerCase().trim();
       const dbKey = aliasesNorm.get(excelKey) ?? excelKey;
-      if (conceptosByName.has(dbKey)) {
-        matched.set(f.concepto, (matched.get(f.concepto) ?? 0) + 1);
+      if (conceptosByNameTipo.has(`${dbKey}|${tipo}`)) {
+        matched.set(`${f.concepto} [${tipo}]`, (matched.get(`${f.concepto} [${tipo}]`) ?? 0) + 1);
       } else {
-        unmatched.set(f.concepto, (unmatched.get(f.concepto) ?? 0) + 1);
+        unmatched.set(`${f.concepto} [${tipo}]`, (unmatched.get(`${f.concepto} [${tipo}]`) ?? 0) + 1);
       }
     }
     console.log(`\n   Conceptos OK (matchean DB):`);
@@ -184,7 +185,7 @@ async function main() {
     const monto = fila.ingreso > 0 ? fila.ingreso : fila.gasto;
     const excelKey = fila.concepto.toLowerCase().trim();
     const dbKey = aliasesNorm.get(excelKey) ?? excelKey;
-    const conceptoMatch = conceptosByName.get(dbKey);
+    const conceptoMatch = conceptosByNameTipo.get(`${dbKey}|${tipo}`);
     if (!conceptoMatch) mapeoDefault++;
     const conceptoId =
       conceptoMatch?.id ??

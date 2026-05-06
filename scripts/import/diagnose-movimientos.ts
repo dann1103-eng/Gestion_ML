@@ -10,17 +10,21 @@
  * y muestra la diferencia con el monto del Excel si se conoce.
  */
 import { argv, exit } from "node:process";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, TipoMovimiento } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 function parseArgs(args: string[]) {
-  const out: { concepto?: string; anio?: number; mes?: number } = {};
+  const out: { concepto?: string; anio?: number; mes?: number; tipo?: TipoMovimiento } = {};
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a === "--concepto") out.concepto = args[++i];
     else if (a === "--anio") out.anio = Number(args[++i]);
     else if (a === "--mes") out.mes = Number(args[++i]);
+    else if (a === "--tipo") {
+      const t = args[++i].toUpperCase();
+      if (t === "INGRESO" || t === "EGRESO") out.tipo = t as TipoMovimiento;
+    }
   }
   return out;
 }
@@ -29,16 +33,24 @@ async function main() {
   const args = parseArgs(argv.slice(2));
   if (!args.concepto || !args.anio || !args.mes) {
     console.error(
-      "Uso: pnpm tsx scripts/import/diagnose-movimientos.ts --concepto NOMBRE --anio YYYY --mes MM",
+      "Uso: pnpm tsx scripts/import/diagnose-movimientos.ts --concepto NOMBRE --anio YYYY --mes MM [--tipo INGRESO|EGRESO]",
     );
     exit(1);
   }
-  const concepto = await prisma.concepto.findUnique({
-    where: { nombre: args.concepto },
+  const conceptos = await prisma.concepto.findMany({
+    where: {
+      nombre: args.concepto,
+      ...(args.tipo ? { tipo: args.tipo } : {}),
+    },
   });
-  if (!concepto) {
+  if (conceptos.length === 0) {
     console.error(`Concepto "${args.concepto}" no existe`);
     exit(1);
+  }
+  if (conceptos.length > 1 && !args.tipo) {
+    console.log(
+      `ℹ️  El concepto "${args.concepto}" existe en ${conceptos.length} tipos: ${conceptos.map((c) => c.tipo).join(", ")}. Listando todos.`,
+    );
   }
 
   const start = new Date(Date.UTC(args.anio, args.mes - 1, 1));
@@ -46,7 +58,7 @@ async function main() {
 
   const movs = await prisma.movimiento.findMany({
     where: {
-      conceptoId: concepto.id,
+      conceptoId: { in: conceptos.map((c) => c.id) },
       fecha: { gte: start, lt: end },
       anulado: false,
     },

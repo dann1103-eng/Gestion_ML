@@ -180,11 +180,11 @@ const slug = (s: string) =>
 async function main() {
   console.log("⏳ Seed iniciando...");
 
-  // Conceptos
+  // Conceptos — nombre puede repetirse entre INGRESO/EGRESO (ej. Actividades Club)
   let i = 0;
   for (const c of CONCEPTOS_INGRESO) {
     await prisma.concepto.upsert({
-      where: { nombre: c.nombre },
+      where: { nombre_tipo: { nombre: c.nombre, tipo: TipoMovimiento.INGRESO } },
       create: {
         nombre: c.nombre,
         tipo: TipoMovimiento.INGRESO,
@@ -197,7 +197,7 @@ async function main() {
   i = 0;
   for (const nombre of CONCEPTOS_EGRESO) {
     await prisma.concepto.upsert({
-      where: { nombre },
+      where: { nombre_tipo: { nombre, tipo: TipoMovimiento.EGRESO } },
       create: { nombre, tipo: TipoMovimiento.EGRESO, orden: i++ },
       update: {},
     });

@@ -88,10 +88,13 @@ export async function getResumen({
     prisma.notaMensual.findMany({ where: { anio, mes: mesActivo } }),
   ]);
 
-  // Pivot: conceptoId -> [12]Decimal
+  // Pivot: conceptoId -> [12]Decimal. Filtro defensivo por tipo:
+  // un Movimiento con tipo X solo cuenta si el Concepto al que apunta tiene tipo X.
+  const conceptoTipo = new Map(conceptos.map((c) => [c.id, c.tipo]));
   const pivot = new Map<string, Prisma.Decimal[]>();
   for (const c of conceptos) pivot.set(c.id, Array.from({ length: 12 }, () => dec()));
   for (const m of movimientos) {
+    if (conceptoTipo.get(m.conceptoId) !== m.tipo) continue; // defensa
     const mes = m.fecha.getUTCMonth();
     const arr = pivot.get(m.conceptoId);
     if (!arr) continue;

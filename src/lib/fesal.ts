@@ -34,7 +34,7 @@ export async function generarEgresoFesalSiCorresponde(
   if (!donante || donante.tipo !== TipoDonante.NUMERARIO) return null;
 
   const concepto = await tx.concepto.findUnique({
-    where: { nombre: CONCEPTO_FESAL },
+    where: { nombre_tipo: { nombre: CONCEPTO_FESAL, tipo: TipoMovimiento.EGRESO } },
   });
   if (!concepto) {
     throw new Error(
