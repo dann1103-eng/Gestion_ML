@@ -18,6 +18,7 @@
     "import:donantes": "tsx --env-file=.env scripts/import/import-donantes.ts",
     "import:presupuesto": "tsx --env-file=.env scripts/import/import-presupuesto.ts",
     "import:donantes-control": "tsx --env-file=.env scripts/import/import-donantes-control.ts",
+    "diagnose:movimientos": "tsx --env-file=.env scripts/import/diagnose-movimientos.ts",
     "create-user": "tsx --env-file=.env scripts/users/create-user.ts",
     "test": "vitest run",
     "test:watch": "vitest",

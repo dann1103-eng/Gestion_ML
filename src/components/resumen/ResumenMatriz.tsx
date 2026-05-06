@@ -181,7 +181,17 @@ function FilaConcepto({
             i === mesActivo - 1 ? "bg-amber-50" : ""
           } ${Number(m) === 0 ? "text-muted-foreground/50" : ""}`}
         >
-          {Number(m) === 0 ? "—" : fmt(m)}
+          {Number(m) === 0 ? (
+            "—"
+          ) : (
+            <Link
+              href={`/movimientos?anio=${anio}&mes=${i + 1}&conceptoId=${fila.conceptoId}&tipo=${tipoQuery}`}
+              className="hover:underline"
+              title={`Ver movimientos de ${fila.nombre} en ${i + 1}/${anio}`}
+            >
+              {fmt(m)}
+            </Link>
+          )}
         </td>
       ))}
     </tr>
