@@ -1,4 +1,4 @@
-import { AlertTriangle, Banknote, CalendarDays, CircleAlert } from "lucide-react";
+import { AlertTriangle, Banknote, CalendarDays, CircleAlert, UserMinus } from "lucide-react";
 import type { Alerta } from "@/server/actions/dashboard";
 
 type Props = { alertas: Alerta[] };
@@ -8,6 +8,7 @@ const ICONO = {
   "convenio-vence": AlertTriangle,
   "sesion-proxima": CalendarDays,
   "fe-atrasada": CircleAlert,
+  "donante-atrasado": UserMinus,
 };
 
 export function AlertasWidget({ alertas }: Props) {
@@ -34,7 +35,7 @@ export function AlertasWidget({ alertas }: Props) {
               <div
                 key={i}
                 className={`flex gap-3 items-start p-2.5 rounded transition-colors ${
-                  a.tipo === "fe-atrasada"
+                  a.tipo === "fe-atrasada" || a.tipo === "donante-atrasado"
                     ? "bg-red-50 hover:bg-red-100"
                     : "hover:bg-[hsl(var(--accent))]"
                 }`}
@@ -42,7 +43,9 @@ export function AlertasWidget({ alertas }: Props) {
                 <Icon
                   size={14}
                   className={`shrink-0 mt-0.5 ${
-                    a.tipo === "fe-atrasada" ? "text-red-600" : "text-[hsl(var(--ring))]"
+                    a.tipo === "fe-atrasada" || a.tipo === "donante-atrasado"
+                      ? "text-red-600"
+                      : "text-[hsl(var(--ring))]"
                   }`}
                   strokeWidth={2}
                 />

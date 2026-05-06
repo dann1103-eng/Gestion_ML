@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { formatMoney } from "@/lib/money";
 import { TipoDonante } from "@prisma/client";
 import { calcularCobranza } from "@/lib/convenios/cobranza";
+import { cumplimientoDonanteAnual } from "@/lib/donantes/al-dia";
+import { CumplimientoMensualWidget } from "@/components/donantes/CumplimientoMensualWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -92,6 +94,27 @@ export default async function DonanteDetallePage({
         redirectTo="/donantes"
         submitLabel="Guardar cambios"
       />
+
+      {donante.aporteMensualEsperado != null && (
+        <section className="mt-8">
+          <CumplimientoMensualWidget
+            donanteId={id}
+            aporteEsperado={String(donante.aporteMensualEsperado)}
+            cumplimiento={await cumplimientoDonanteAnual(
+              id,
+              new Date().getUTCFullYear(),
+            ).then((arr) =>
+              arr.map((c) => ({
+                mes: c.mes,
+                estado: c.estado,
+                aportadoMes: c.aportadoMes.toString(),
+                esperado: c.esperado?.toString() ?? null,
+              })),
+            )}
+            anio={new Date().getUTCFullYear()}
+          />
+        </section>
+      )}
 
       {/* Historial section — only show if there are movements */}
       {movimientos.length > 0 && (

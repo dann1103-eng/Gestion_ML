@@ -112,6 +112,11 @@ const donanteBaseSchema = z.object({
   entregaReciboFiscal: z.coerce.boolean().default(false),
   estado: z.nativeEnum(EstadoDonante).default(EstadoDonante.ACTIVO),
   notas: stringOrNull,
+  aporteMensualEsperado: opt(
+    z
+      .string()
+      .regex(/^-?\d+(\.\d{1,2})?$/, "Monto inválido"),
+  ),
 });
 
 const empresaDetalleSchema = z.object({

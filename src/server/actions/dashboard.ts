@@ -188,6 +188,20 @@ export async function getDashboardData(opts?: { anio?: number; mes?: number }) {
     }
   }
 
+  // Donantes recurrentes con 2+ meses consecutivos atrasados
+  try {
+    const { donantesAtrasados } = await import("@/lib/donantes/al-dia");
+    const atrasados = await donantesAtrasados(2);
+    for (const a of atrasados.slice(0, 5)) {
+      alertas.push({
+        tipo: "donante-atrasado",
+        mensaje: `${a.nombre} (${a.tipo.toLowerCase()}): ${a.mesesAtrasados} meses sin aporte`,
+      });
+    }
+  } catch {
+    // si la column no existe aún (pre-migration), ignorar
+  }
+
   for (const conv of convenios) {
     const dias = Math.ceil(
       (conv.fechaFin.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
@@ -230,7 +244,12 @@ export async function getDashboardData(opts?: { anio?: number; mes?: number }) {
 }
 
 export type Alerta = {
-  tipo: "saldo-bajo" | "convenio-vence" | "sesion-proxima" | "fe-atrasada";
+  tipo:
+    | "saldo-bajo"
+    | "convenio-vence"
+    | "sesion-proxima"
+    | "fe-atrasada"
+    | "donante-atrasado";
   mensaje: string;
 };
 

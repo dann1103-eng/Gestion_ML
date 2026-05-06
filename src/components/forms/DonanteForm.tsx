@@ -253,6 +253,38 @@ export function DonanteForm({ initial, onSubmit, redirectTo, submitLabel = "Guar
         </Card>
       ) : null}
 
+      {(tipo === "COOPERADOR" || tipo === "SUPERNUMERARIO") && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Aporte mensual esperado</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Label htmlFor="aporteMensualEsperado">
+              Monto mensual ($) — opcional
+            </Label>
+            <Input
+              id="aporteMensualEsperado"
+              name="aporteMensualEsperado"
+              type="text"
+              inputMode="decimal"
+              placeholder="ej. 100.00"
+              defaultValue={
+                initial?.aporteMensualEsperado != null
+                  ? String(initial.aporteMensualEsperado)
+                  : ""
+              }
+            />
+            {e("aporteMensualEsperado") && (
+              <p className="text-xs text-red-600">{e("aporteMensualEsperado")}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Si se define, el sistema marcará al donante como atrasado cuando
+              no cubra este monto en el mes corriente.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Notas</CardTitle>
